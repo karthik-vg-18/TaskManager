@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <button class="dark-toggle">Toggle Dark Mode</button>
+  <div class="container">
+    <h2>Dashboard</h2>
+    <div id="userTasks">
+      <h3>My Tasks</h3>
+      <ul id="assignedTasks"></ul>
+    </div>
+    <div id="managerTasks" style="display: none;">
+      <h3>Tasks I've Created</h3>
+      <ul id="createdTasks"></ul>
+      <a href="task.html">Create New Task</a>
+    </div>
+  </div>
+  <script src="assets/script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return location.href = "index.html";
+
+      const res = await fetch("http://localhost:4567/dashboard", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await res.json();
+
+      if (data.assigned) {
+        data.assigned.forEach(task => {
+          const li = document.createElement("li");
+          li.textContent = `${task.title} - ${task.status}`;
+          document.getElementById("assignedTasks").appendChild(li);
+        });
+      }
+      if (data.created) {
+        document.getElementById("managerTasks").style.display = "block";
+        data.created.forEach(task => {
+          const li = document.createElement("li");
+          li.textContent = `${task.title} - ${task.status}`;
+          document.getElementById("createdTasks").appendChild(li);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

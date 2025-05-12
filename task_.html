@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Task</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <button class="dark-toggle">Toggle Dark Mode</button>
+  <div class="container">
+    <h2>Create Task</h2>
+    <form id="taskForm">
+      <input type="text" id="title" placeholder="Task Title" required>
+      <textarea id="description" placeholder="Task Description" required></textarea>
+      <input type="email" id="assignee" placeholder="Assign To (Email)" required>
+      <button type="submit">Create Task</button>
+    </form>
+  </div>
+  <script src="assets/script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("taskForm");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:4567/tasks", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            title: document.getElementById("title").value,
+            description: document.getElementById("description").value,
+            assignee: document.getElementById("assignee").value
+          })
+        });
+        const data = await res.json();
+        if (data.message) {
+          alert("Task Created");
+          window.location.href = "dashboard.html";
+        } else {
+          alert("Error: " + data.error);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
